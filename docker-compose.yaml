@@ -1,0 +1,10 @@
+services:
+  gemini-cli:
+    image: naoyoshinori/gemini-cli:0.1-node
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - ./.gemini_user:/home/node/.gemini
+    env_file:
+      - ./.env.gemini
+    command: ["sleep", "infinity"]
