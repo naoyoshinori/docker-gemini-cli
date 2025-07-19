@@ -10,6 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@google/gemini-cli": "^0.1.12"
+    "@google/gemini-cli": "^0.1.13"
   }
 }
