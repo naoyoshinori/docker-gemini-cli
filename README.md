@@ -18,6 +18,7 @@ A ready-to-use, secure, and convenient Docker environment for [Google's Gemini C
   - [Option 2: Run a Single Command](#option-2-run-a-single-command)
   - [Option 3: Use with `docker-compose`](#option-3-use-with-docker-compose)
   - [Option 4: Use as a VS Code Dev Container](#option-4-use-as-a-vs-code-dev-container)
+- [Updating the Docker Image](#updating-the-docker-image)
 - [Troubleshooting](#troubleshooting)
   - [Running as root](#running-as-root)
 - [Image Tagging Strategy](#image-tagging-strategy)
@@ -180,6 +181,14 @@ Create a `.devcontainer/devcontainer.json` file in your project's root with the 
 ```
 
 After creating the file, open your project in VS Code and use the "Reopen in Container" command.
+
+### Updating the Docker Image
+
+To ensure you are using the latest version of the Docker image, pull the updated image from Docker Hub:
+
+```bash
+docker pull naoyoshinori/gemini-cli:0.1-node
+```
 
 ## Troubleshooting
 
