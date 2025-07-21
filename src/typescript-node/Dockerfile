@@ -1,24 +1,6 @@
-FROM mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm
+ARG VARIANT=22-bookworm
+FROM mcr.microsoft.com/devcontainers/typescript-node:${VARIANT}
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    xdg-utils \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/*
-
-RUN mkdir -p /home/node/gemini-cli /workspace && chown -R node:node /home/node/gemini-cli /workspace
-
-WORKDIR /home/node/gemini-cli
-
-COPY --chown=node:node package.json package-lock.json ./
-
-USER node
-
-RUN npm install --production
-
-ENV PATH /home/node/gemini-cli/node_modules/.bin:$PATH
-
-WORKDIR /workspace
-
-CMD [ "bash" ]
+ARG NODE_MODULES="@google/gemini-cli"
+RUN su node -c "umask 0002 && npm install -g ${NODE_MODULES}" \
+    && npm cache clean --force > /dev/null 2>&1
