@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-variants=("node" "typescript-node")
+variants=("typescript-node" "javascript-node" "node")
 
 for variant in "${variants[@]}"; do
   ./build.sh "$variant"

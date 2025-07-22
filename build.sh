@@ -1,22 +1,17 @@
 #!/bin/bash -e
 
-ENV_DOCKER_FILE=".env.docker"
+ENV_DOCKER=".env.docker"
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <base_name>"
+  echo "Usage: $0 <image>"
   exit 1
 fi
 
 SRC_DIR="./src/$1"
 BUILD_CONF="$SRC_DIR/build.conf"
 
-cleanup() {
-  rm -f "$SRC_DIR/package.json" "$SRC_DIR/package-lock.json"
-}
-trap cleanup EXIT
-
-if [ ! -f "$ENV_DOCKER_FILE" ]; then
-  echo "$ENV_DOCKER_FILE file not found"
+if [ ! -f "$ENV_DOCKER" ]; then
+  echo "$ENV_DOCKER file not found"
   exit 1
 fi
 
@@ -30,30 +25,25 @@ if [ ! -f "$BUILD_CONF" ]; then
   exit 1
 fi
 
-if [ ! -f "./package.json" ] || [ ! -f "./package-lock.json" ]; then
-  echo "package.json or package-lock.json not found"
-  exit 1
-fi
-
 source "$BUILD_CONF"
-source "$ENV_DOCKER_FILE"
+source "$ENV_DOCKER"
 
 IMAGE_NAME="${DOCKER_REGISTRY_USER}/gemini-cli"
-VERSION_FULL=$(jq -r '.dependencies["@google/gemini-cli"]' "./package.json" | sed 's/[\^~]//g')
-VERSION_SHORT=$(echo "$VERSION_FULL" | cut -d '.' -f 1,2)
 
 echo "Docker build"
 
-cp "./package.json" "$SRC_DIR/package.json"
-cp "./package-lock.json" "$SRC_DIR/package-lock.json"
+docker pull "$IMAGE:$VARIANT" || true
 
-docker pull "$BASE_IMAGE:$BASE_IMAGE_VERSION" || true
+docker build --load -t "$IMAGE_NAME:latest" "$SRC_DIR"
 
-docker build -t "$IMAGE_NAME:latest" "$SRC_DIR"
+docker run -it --rm "$IMAGE_NAME:latest" gemini --version | tr -d "\r\n" > "$SRC_DIR/version.txt"
 
-docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:patch-$VERSION_FULL-$BASE_IMAGE-$BASE_IMAGE_VERSION"
-docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:$VERSION_SHORT-$BASE_IMAGE-$BASE_IMAGE_VERSION"
-docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:$VERSION_SHORT-$BASE_IMAGE"
+VERSION_FULL=$(cat "$SRC_DIR/version.txt")
+VERSION_SHORT=$(echo "$VERSION_FULL" | cut -d '.' -f 1,2)
+
+docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:patch-$VERSION_FULL-$IMAGE-$VARIANT"
+docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:$VERSION_SHORT-$IMAGE-$VARIANT"
+docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:$VERSION_SHORT-$IMAGE"
 
 docker rmi "$IMAGE_NAME:latest"
 
