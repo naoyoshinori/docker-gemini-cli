@@ -3,8 +3,9 @@ services:
     image: naoyoshinori/gemini-cli:0.1-node
     working_dir: /workspace
     volumes:
-      - .:/workspace
-      - ./.gemini_user:/home/node/.gemini
+      - ~/.gitconfig:/home/node/.gitconfig
+      - ~/.gemini_user:/home/node/.gemini
+      - .:/workspace:cached
     env_file:
-      - ./.env.gemini
+      - ~/.env.gemini
     command: ["sleep", "infinity"]
