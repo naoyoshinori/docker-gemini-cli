@@ -2,15 +2,16 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A ready-to-use, secure, and convenient Docker environment for [Google's Gemini CLI](https://github.com/google-gemini/gemini-cli) (`@google/gemini-cli`).
+A ready-to-use and convenient Docker environment for [Google's Gemini CLI](https://github.com/google-gemini/gemini-cli) (`@google/gemini-cli`).
 
-[This project](https://github.com/naoyoshinori/docker-gemini-cli) provides Docker images that let you use the Gemini CLI without installing Node.js on your system. It's designed for security and ease of use, running as a non-root user and offering seamless integration with VS Code Dev Containers. Two main variants are offered to suit different needs: a minimal image for direct execution and a feature-rich image for development.
+[This project](https://github.com/naoyoshinori/docker-gemini-cli) provides Docker images that let you use the Gemini CLI without installing Node.js on your system. It's designed for security and ease of use, running as a non-root user and offering seamless integration with VS Code Dev Containers. Three main variants are offered to suit different needs: a minimal image for direct execution and two feature-rich images for development.
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Image Variants](#image-variants)
   - [`gemini-cli:<version>-node`](#gemini-cliversion-node)
+  - [`gemini-cli:<version>-javascript-node`](#gemini-cliversion-javascript-node)
   - [`gemini-cli:<version>-typescript-node`](#gemini-cliversion-typescript-node)
 - [Initial Setup](#initial-setup)
 - [How to Use This Image](#how-to-use-this-image)
@@ -22,13 +23,8 @@ A ready-to-use, secure, and convenient Docker environment for [Google's Gemini C
 - [Troubleshooting](#troubleshooting)
   - [Running as root](#running-as-root)
 - [Image Tagging Strategy](#image-tagging-strategy)
-- [Contributing to This Project](#contributing-to-this-project)
-  - [Step 1: Clone the Repository](#step-1-clone-the-repository)
-  - [Step 2: Open in Dev Container](#step-2-open-in-dev-container)
-  - [Step 3: Configure Your Environment](#step-3-configure-your-environment)
-  - [Step 4: Build, Release, and Update](#step-4-build-release-and-update)
-  - [Updating the Gemini CLI Package](#updating-the-gemini-cli-package)
 - [License](#license)
+- [Contributing](#contributing)
 
 ## Prerequisites
 
@@ -40,15 +36,9 @@ Before you begin, ensure you have the necessary tools installed.
 - Docker Compose (if using Option 3, typically included with Docker Desktop)
 - [Gemini API Key](https://aistudio.google.com/app/apikey) (recommended, but optional for VS Code Dev Containers)
 
-#### For Contributing
-
-- [Git](https://git-scm.com/downloads/)
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) for VS Code
-
 ## Image Variants
 
-This image comes in two main variants to suit different use cases.
+This image comes in three main variants to suit different use cases.
 
 ### `gemini-cli:<version>-node`
 
@@ -56,17 +46,23 @@ The `node` variant is based on the Node.js [Docker Official Image](https://hub.d
 
 - **Recommended Use:** For running `gemini-cli` commands with `docker run` or `docker-compose`.
 
+### `gemini-cli:<version>-javascript-node`
+
+The `javascript-node` variant is based on the [Microsoft Dev Containers `javascript-node` image](https://github.com/devcontainers/templates/tree/main/src/javascript-node). It includes common development tools like `git` and `zsh` for JavaScript development.
+
+- **Recommended Use:** As a development environment in VS Code Dev Containers for JavaScript projects.
+
 ### `gemini-cli:<version>-typescript-node`
 
-The `typescript-node` variant is based on the [Microsoft Dev Containers `typescript-node` image](https://github.com/devcontainers/templates/tree/main/src/typescript-node). In addition to `gemini-cli`, it includes common development tools like `git`, `zsh`, and `sudo`, providing a richer development environment.
+The `typescript-node` variant is based on the [Microsoft Dev Containers `typescript-node` image](https://github.com/devcontainers/templates/tree/main/src/typescript-node). In addition to the tools in `javascript-node`, it includes TypeScript-specific tools and provides a richer development environment.
 
-- **Recommended Use:** As a development environment in VS Code Dev Containers. It's useful when you need to run `git` commands or install additional packages inside the container.
+- **Recommended Use:** As a development environment in VS Code Dev Containers for TypeScript projects.
 
 ## Initial Setup
 
 Before using any of the options below, you'll need to perform these one-time setup steps in your project's root directory.
 
-1. **Create a `.env` file for your API key (Recommended):** To keep your API key secure, create a `.env` file. This step is optional for the VS Code Dev Container method if you prefer to authenticate via a browser.
+1. **Create a `.env` file for your Gemini API key (Recommended):** Create a `.env` file to keep your API key separate from your code. This step is optional if you are authenticating via a browser in the VS Code Dev Container.
 
     **.env**
 
@@ -80,7 +76,7 @@ Before using any of the options below, you'll need to perform these one-time set
     mkdir -p .gemini_user
     ```
 
-> **Note:** It is strongly recommended to add both `.env` and `.gemini_user` to your `.gitignore` file to prevent your credentials and settings from being checked into version control.
+> **Note:** It is recommended to add both `.env` and `.gemini_user` to your `.gitignore` file to prevent your credentials and settings from being checked into version control.
 
 ## How to Use This Image
 
@@ -135,27 +131,34 @@ services:
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     volumes:
-      - .:/workspace
-      - ./.gemini_user:/home/node/.gemini
+      - .:/workspace:cached
+      - ./.gemini_user:/home/node/.gemini:cached
     command: ["sleep", "infinity"]
 ```
 
 Then, start and use the environment:
 
+Start the container in the background
+
 ```bash
-# Start the container in the background
 docker-compose up -d
+```
 
-# Run gemini in interactive mode
+Run gemini in interactive mode
+
+```bash
 docker-compose exec gemini-cli gemini
+```
 
-# Stop and remove the container when you're done
+Stop and remove the container when you're done
+
+```bash
 docker-compose down
 ```
 
 ### Option 4: Use as a VS Code Dev Container
 
-Using the `typescript-node` variant as a development environment is highly recommended for an integrated experience.
+The `javascript-node` and `typescript-node` variants are designed for use as a VS Code Dev Container, providing a consistent development environment.
 
 **Authentication:** You have two options for authentication:
 
@@ -163,14 +166,14 @@ Using the `typescript-node` variant as a development environment is highly recom
 
 2. **Interactive Browser-based Authentication:** If you omit the `.env` file, you can authenticate interactively. The first time you run a `gemini` command in the container's terminal, you will be prompted to open a URL in your local browser to sign in. VS Code's port forwarding handles this process seamlessly.
 
-Create a `.devcontainer/devcontainer.json` file in your project's root with the following content:
+Create a `.devcontainer/devcontainer.json` file in your project's root with the following content. Choose the image that best fits your project (`javascript-node` or `typescript-node`).
 
 **`.devcontainer/devcontainer.json`**
 
 ```json
 {
   "name": "Gemini CLI Dev Container",
-  "image": "naoyoshinori/gemini-cli:0.1-typescript-node",
+  "image": "naoyoshinori/gemini-cli:0.1-javascript-node",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "mounts": [
     "source=${localWorkspaceFolder}/.gemini_user,target=/home/node/.gemini,type=bind,consistency=cached"
@@ -194,26 +197,9 @@ docker pull naoyoshinori/gemini-cli:0.1-node
 
 ### Running as root
 
-In some cases, you might need root privileges inside the container. This can be necessary to resolve permission errors, especially with files mounted from the host, or to install system-level packages using `apt`. For these scenarios, it is recommended to use the `typescript-node` variant, which includes `sudo`.
+In some cases, you might need root privileges inside the container, for example to resolve permission errors with files mounted from the host.
 
-#### For VS Code Dev Containers
-
-To run as the `root` user in a Dev Container, modify your `.devcontainer/devcontainer.json` to set `remoteUser` to `"root"` and adjust the volume mount for Gemini's configuration.
-
-**`.devcontainer/devcontainer.json`**
-
-```json
-{
-  "name": "Gemini CLI Dev Container",
-  "image": "naoyoshinori/gemini-cli:0.1-typescript-node",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-  "mounts": [
-    "source=${localWorkspaceFolder}/.gemini_user,target=/root/.gemini,type=bind,consistency=cached"
-  ],
-  "workspaceFolder": "/workspace",
-  "remoteUser": "root"
-}
-```
+If you require root access, you can try the following modifications.
 
 #### For `docker-compose`
 
@@ -224,114 +210,68 @@ To run the `docker-compose` service as root, add `user: root` to the service def
 ```yaml
 services:
   gemini-cli:
-    image: naoyoshinori/gemini-cli:0.1-typescript-node
+    image: naoyoshinori/gemini-cli:0.1-node
     user: root
     working_dir: /workspace
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     volumes:
-      - .:/workspace
-      - ./.gemini_user:/root/.gemini # Note the path change to /root/.gemini
+      - .:/workspace:cached
+      - ./.gemini_user:/root/.gemini:cached # Note the path change to /root/.gemini
     command: ["sleep", "infinity"]
+```
+
+#### For VS Code Dev Containers
+
+To run as the `root` user in a Dev Container, modify your `.devcontainer/devcontainer.json` to set `remoteUser` to `"root"` and adjust the volume mount for Gemini's configuration.
+
+**`.devcontainer/devcontainer.json`**
+
+```json
+{
+  "name": "Gemini CLI Dev Container",
+  "image": "naoyoshinori/gemini-cli:0.1-javascript-node",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "mounts": [
+    "source=${localWorkspaceFolder}/.gemini_user,target=/root/.gemini,type=bind,consistency=cached"
+  ],
+  "workspaceFolder": "/workspace",
+  "remoteUser": "root"
+}
 ```
 
 ## Image Tagging Strategy
 
-Tags for [`naoyoshinori/gemini-cli`](https://hub.docker.com/r/naoyoshinori/gemini-cli) are structured to clearly indicate their version and variant. **The `latest` tag is not used.** You should always specify a tag that includes a version number to ensure reproducibility.
+Tags for [`naoyoshinori/gemini-cli`](https://hub.docker.com/r/naoyoshinori/gemini-cli) are structured to clearly indicate their version, base type, and specific variant. **The `latest` tag is not used.** You should always specify a tag that includes a version number to ensure reproducibility.
 
-**Format:** `<image>:<version>-<variant>-<base_version>-<os>`
+**Format:** `<image>:<version>-<base_type>-<variant>`
 
 - **`<version>`**: The version of the Gemini CLI (e.g., `0.1`).
-- **`<variant>`**: The image variant (e.g., `node`, `typescript-node`).
-- **`<base_version>`**: The underlying Node.js version (e.g., `22`, `1-22`).
-- **`<os>`**: The base image's OS (e.g., `bookworm-slim`, `bookworm`).
+- **`<base_type>`**: The image's base type (e.g., `node`, `javascript-node`, `typescript-node`).
+- **`<variant>`**: The specific Node.js version and OS combination (e.g., `22-bookworm-slim`, `22-bookworm`).
 
 ### Main Tags
 
 For everyday use and development, we recommend the following main tags:
 
 - `naoyoshinori/gemini-cli:0.1-node`
+- `naoyoshinori/gemini-cli:0.1-javascript-node`
 - `naoyoshinori/gemini-cli:0.1-typescript-node`
+
+These main tags omit the `<variant>` part, indicating the default or recommended Node.js version and OS for that base type.
 
 ### Fully-Qualified Tags for Reproducibility
 
-A tag that includes the OS version, such as `naoyoshinori/gemini-cli:0.1-typescript-node-1-22-bookworm`, is called a "fully-qualified tag." These tags point to a specific, immutable build.
+A tag that includes the specific Node.js version and OS, such as `naoyoshinori/gemini-cli:0.1-javascript-node-22-bookworm`, is called a "fully-qualified tag." These tags point to a specific, immutable build.
 
 **It is highly recommended to use these fully-qualified tags for CI/CD pipelines or any production-like environment where reproducibility is critical.**
-
-## Contributing to This Project
-
-Interested in improving this Docker image? A Docker-in-Docker development environment is ready for you.
-
-### Step 1: Clone the Repository
-
-First, get a local copy of this project.
-
-```bash
-git clone https://github.com/naoyoshinori/docker-gemini-cli.git
-cd docker-gemini-cli
-```
-
-### Step 2: Open in Dev Container
-
-Open the cloned repository folder in VS Code. When prompted, click **"Reopen in Container"**. This will launch a development environment where you can safely build and test changes without affecting your local Docker setup.
-
-### Step 3: Configure Your Environment
-
-Before you can build or release images, you must create a `.env` file in the project root to specify your Docker registry credentials.
-
-```env
-# .env
-IMAGE_REGISTRY=your_docker_registry # e.g., docker.io or ghcr.io
-DOCKER_REGISTRY_USER=your_docker_registry_username
-DOCKER_REGISTRY_PASSWORD=your_docker_registry_password_or_token
-```
-
-### Step 4: Build, Release, and Update
-
-After configuring your `.env` file, you can use the following scripts.
-
-#### Build the Image
-
-Run the build script to create the Docker images on your local machine.
-
-```bash
-chmod +x build.sh
-
-# To build the minimal 'node' variant
-./build.sh node
-
-# To build the feature-rich 'typescript-node' variant
-./build.sh typescript-node
-```
-
-#### Release the Image
-
-Run the release script to push the built images to your Docker registry.
-
-```bash
-chmod +x release.sh
-
-# To release the 'node' variant
-./release.sh node
-
-# To release the 'typescript-node' variant
-./release.sh typescript-node
-```
-
-### Updating the Gemini CLI Package
-
-To update the `@google/gemini-cli` package to the latest version, run the update script. This will reset and re-initialize `package.json` and `package-lock.json`.
-
-```bash
-chmod +x update.sh
-./update.sh
-```
-
-After the script finishes, run the build and release scripts again to publish a new version.
 
 ## License
 
 - The Google Gemini CLI is licensed under the [Apache 2.0 License](https://github.com/google/generative-ai-go/blob/main/LICENSE).
 - The Dockerfile and associated scripts for this project are licensed under the [MIT License](LICENSE).
 - As with all Docker images, this image also contains other software under other licenses (e.g., the base OS distribution and its dependencies).
+
+## Contributing
+
+Interested in contributing to this project? See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
