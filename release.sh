@@ -43,4 +43,8 @@ docker push "$IMAGE_NAME:patch-$VERSION_FULL-$IMAGE-$VARIANT"
 docker push "$IMAGE_NAME:$VERSION_SHORT-$IMAGE-$VARIANT"
 docker push "$IMAGE_NAME:$VERSION_SHORT-$IMAGE"
 
+docker push "$IMAGE_NAME:patch-$VERSION_FULL-sandbox-$IMAGE-$VARIANT"
+docker push "$IMAGE_NAME:$VERSION_SHORT-sandbox-$IMAGE-$VARIANT"
+docker push "$IMAGE_NAME:$VERSION_SHORT-sandbox-$IMAGE"
+
 echo "Docker release done"

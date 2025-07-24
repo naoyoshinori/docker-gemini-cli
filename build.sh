@@ -34,7 +34,8 @@ echo "Docker build"
 
 docker pull "$IMAGE:$VARIANT" || true
 
-docker build --load -t "$IMAGE_NAME:latest" "$SRC_DIR"
+docker build --load -t "$IMAGE_NAME:latest" "$SRC_DIR/.devcontainer"
+devcontainer build --image-name "$IMAGE_NAME:latest-sandbox" --workspace-folder "$SRC_DIR"
 
 docker run -it --rm "$IMAGE_NAME:latest" gemini --version | tr -d "\r\n" > "$SRC_DIR/version.txt"
 
@@ -45,6 +46,11 @@ docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:patch-$VERSION_FULL-$IMAGE-$VARIANT
 docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:$VERSION_SHORT-$IMAGE-$VARIANT"
 docker tag "$IMAGE_NAME:latest" "$IMAGE_NAME:$VERSION_SHORT-$IMAGE"
 
+docker tag "$IMAGE_NAME:latest-sandbox" "$IMAGE_NAME:patch-$VERSION_FULL-sandbox-$IMAGE-$VARIANT"
+docker tag "$IMAGE_NAME:latest-sandbox" "$IMAGE_NAME:$VERSION_SHORT-sandbox-$IMAGE-$VARIANT"
+docker tag "$IMAGE_NAME:latest-sandbox" "$IMAGE_NAME:$VERSION_SHORT-sandbox-$IMAGE"
+
 docker rmi "$IMAGE_NAME:latest"
+docker rmi "$IMAGE_NAME:latest-sandbox"
 
 echo "Docker build done"
