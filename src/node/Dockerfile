@@ -27,3 +27,5 @@ RUN \
     && npm cache clean --force > /dev/null 2>&1
 
 ENV PATH=/usr/local/share/npm-global/bin:$PATH
+
+USER node
