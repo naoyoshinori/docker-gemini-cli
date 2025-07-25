@@ -1,10 +1,11 @@
 services:
   gemini-cli:
     image: naoyoshinori/gemini-cli:0.1-node
+    user: node
     working_dir: /workspace
     volumes:
       - ~/.gitconfig:/home/node/.gitconfig
-      - ~/.gemini_user:/home/node/.gemini
+      - ~/.gemini_user:/home/node/.gemini:cached
       - .:/workspace:cached
     env_file:
       - ~/.env.gemini
