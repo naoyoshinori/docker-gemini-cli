@@ -62,3 +62,21 @@ This example demonstrates how to run Gemini CLI alongside an MCP Gateway using D
     If the list of MCP Servers is displayed, the MCP Gateway setup is successful.
 
     ![MCP Server list result](../../assets/gemini-cli-mcp-list-result.png)
+
+---
+
+## Configuring GitHub Official (Docker MCP Server)
+
+To enable GitHub Official (Docker MCP Server) for seamless integration with GitHub APIs, follow these steps:
+
+1. **Create a Personal Access Token on GitHub:**
+    Generate a new fine-grained personal access token in your GitHub settings. This token will be used for authentication.
+
+    ![Create a Personal Access Token](../../assets/github-personal-access-token.png)
+
+2. **Configure the Token in Docker Desktop's MCP Toolkit:**
+    Open Docker Desktop, navigate to the MCP Toolkit, select "GitHub Official" from the servers, and set your newly created Personal Access Token in the configuration.
+
+    ![Configure Personal Access Token in Docker Desktop](../../assets/docker-desktop-github-official.png)
+
+Once these steps are completed, you will be able to utilize GitHub Official (Docker MCP Server) through your Gemini CLI setup.
