@@ -1,0 +1,17 @@
+services:
+  gemini-cli:
+    # Select the image variant to use
+    image: naoyoshinori/gemini-cli:0.1-node
+    # Working directory inside the container
+    working_dir: /workspace
+    # Synchronize files between host and container
+    volumes:
+      # Mount host's ~/.gemini for persistent Gemini CLI user data
+      - ~/.gemini:/home/node/.gemini:cached
+      # Mount the current project directory to /workspace inside the container
+      - .:/workspace:cached
+    # Load environment variables from .env.gemini in the home directory
+    env_file:
+      - ~/.env.gemini
+    # Keep the container running indefinitely
+    command: ["sleep", "infinity"]
