@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcpGateway": {
+      "type": "see",
+      "url": "http://mcp-gateway:8811"
+    }
+  }
+}

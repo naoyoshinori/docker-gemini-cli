@@ -1,0 +1,28 @@
+services:
+  gemini-cli:
+    image: naoyoshinori/gemini-cli:0.1-node
+    working_dir: /workspace
+    volumes:
+      - ~/.gemini:/home/node/.gemini:cached
+      - .:/workspace:cached
+    env_file:
+      - ~/.env.gemini
+    command: ["sleep", "infinity"]
+    depends_on:
+    - mcp-gateway
+
+  mcp-gateway:
+    image: docker/mcp-gateway
+    ports:
+      - "8811:8811"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/mcp:/mcp
+    command:
+      - --catalog=/mcp/catalogs/docker-mcp.yaml
+      - --config=/mcp/config.yaml
+      - --registry=/mcp/registry.yaml
+      - --secrets=docker-desktop
+      - --watch=true
+      - --transport=sse
+      - --port=8811
