@@ -1,0 +1,24 @@
+{
+  "name": "Gemini CLI Dev Container",
+
+  // Select the image variant to use. For Dev Containers, `javascript-node` or `typescript-node` variants are recommended as they include development tools.
+  "image": "naoyoshinori/gemini-cli:0.1-javascript-node",
+
+  // Load environment variables from .env.gemini in the home directory
+  "runArgs": ["--env-file","${localEnv:HOME}${localEnv:USERPROFILE}/.env.gemini"],
+
+  // Configures the workspace folder. By default, it's set to:
+	// "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  // Mounts the workspace. By default, it mounts the directory as:
+  // "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+
+  // Persist user settings and data
+  "mounts": [
+    // Mount host's ~/.gemini for persistent Gemini CLI user data (authentication, history, etc.)
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gemini,target=/home/node/.gemini,type=bind,consistency=cached"
+  ],
+
+  // Specify the user to run operations inside the container
+  "remoteUser": "node"
+}
