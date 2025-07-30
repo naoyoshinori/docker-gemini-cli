@@ -29,7 +29,7 @@ source "$BUILD_CONF"
 source "$ENV_DOCKER"
 
 IMAGE_NAME="${DOCKER_REGISTRY_USER}/gemini-cli"
-VERSION_FULL=$(cat "$SRC_DIR/version.txt" | sed 's/^v//g')
+VERSION_FULL=$(cat "$SRC_DIR/version.txt")
 VERSION_SHORT=$(echo "$VERSION_FULL" | cut -d '.' -f 1,2)
 
 echo "Docker registry login"
