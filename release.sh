@@ -10,11 +10,6 @@ fi
 SRC_DIR="./src/$1"
 BUILD_CONF="$SRC_DIR/build.conf"
 
-if [ ! -f "$ENV_DOCKER" ]; then
-  echo "$ENV_DOCKER file not found"
-  exit 1
-fi
-
 if [ ! -d "$SRC_DIR" ]; then
   echo "Source directory $SRC_DIR does not exist"
   exit 1
@@ -26,7 +21,10 @@ if [ ! -f "$BUILD_CONF" ]; then
 fi
 
 source "$BUILD_CONF"
-source "$ENV_DOCKER"
+
+if [ -f "$ENV_DOCKER" ]; then
+  source "$ENV_DOCKER"
+fi
 
 IMAGE_NAME="${DOCKER_REGISTRY_USER}/gemini-cli"
 VERSION_FULL=$(cat "$SRC_DIR/version.txt")
@@ -35,7 +33,7 @@ VERSION_SHORT=$(echo "$VERSION_FULL" | cut -d '.' -f 1,2)
 echo "Docker registry login"
 
 set +x
-echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USER" --password-stdin $IMAGE_REGISTRY
+echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USER" --password-stdin $DOCKER_IMAGE_REGISTRY
 
 echo "Docker registry push"
 
