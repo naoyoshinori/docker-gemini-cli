@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '0 11 * * *'
   push:
     branches:
       - main
@@ -26,14 +26,13 @@ jobs:
 
       - name: Build and Push Docker Images
         run: |
+          export DOCKER_IMAGE_REGISTRY=${{ secrets.DOCKER_IMAGE_REGISTRY }}
+          export DOCKER_REGISTRY_USER=${{ secrets.DOCKER_REGISTRY_USER }}
+          export DOCKER_REGISTRY_PASSWORD=${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
           VARIANTS=("typescript-node" "javascript-node" "node")
           for VARIANT in "${VARIANTS[@]}"; do
             echo "Building and pushing $VARIANT image..."
-
-            export DOCKER_IMAGE_REGISTRY=${{ secrets.DOCKER_IMAGE_REGISTRY }}
-            export DOCKER_REGISTRY_USER=${{ secrets.DOCKER_REGISTRY_USER }}
-            export DOCKER_REGISTRY_PASSWORD=${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-
             chmod +x ./build.sh   && ./build.sh   "$VARIANT"
             chmod +x ./release.sh && ./release.sh "$VARIANT"
           done
