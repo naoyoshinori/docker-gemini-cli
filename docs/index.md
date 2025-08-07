@@ -6,13 +6,13 @@ For detailed information on the CLI's features, please refer to the [official do
 
 ## User Guide
 
-* [**Getting Started (`getting-started.md`)**](./getting-started.md)
+* [**Getting Started**](./getting-started.md)
   * Guides you through the initial setup, basic execution with `docker run`, and links to more advanced use cases.
-* [**Image Variants (`image-variants.md`)**](./image-variants.md)
+* [**Image Variants**](./image-variants.md)
   * Explains the differences between the three Docker image types and how to choose one.
 
 ## For Developers
 
 This section provides information for those who want to contribute to this project or customize it for their own needs.
 
-* [**Contribution Guide (`CONTRIBUTING.md`)**](../CONTRIBUTING.md): Explains how to set up the development environment and the procedures for building and releasing.
+* [**Contribution Guide**](https://github.com/naoyoshinori/docker-gemini-cli/blob/main/CONTRIBUTING.md): Explains how to set up the development environment and the procedures for building and releasing.
