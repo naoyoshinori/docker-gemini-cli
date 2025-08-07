@@ -1,49 +1,56 @@
 # Getting Started Guide
 
-This Docker image comes with `@google/gemini-cli` pre-installed.
-You don't need to install Node.js or related tools on your local machine; with just Docker, you can immediately try out the functionalities of Gemini CLI.
+This guide explains the basic steps to get started with the Gemini CLI using Docker. This Docker image comes with `@google/gemini-cli` pre-installed, so you don't need to install Node.js on your local machine.
 
-## Prerequisites
+## 1. Prerequisites
 
-1. Install Docker
+Before you begin, make sure you have the following:
 
-    [Docker Official Website](https://www.docker.com/get-started)
+* **Docker**: Installed on your system. You can get it from the [Docker Official Website](https://www.docker.com/get-started).
+* **Google Gemini API Key**: Required to use the Gemini models. You can obtain one from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
-2. Create a `.env.gemini` file in your **home directory** and add your **Google Gemini API key** to it.
+## 2. Initial Setup
 
-    **Example:**
+Prepare a configuration file for your API key and a directory to persist user data.
+
+* **Create the `.env.gemini` file**: In your **home directory**, create a file named `.env.gemini`. Add the following line to the file, replacing `YOUR_API_KEY_HERE` with your actual key.
 
     ```bash
-    GEMINI_API_KEY=YOUR_API_KEY
+    GEMINI_API_KEY=YOUR_API_KEY_HERE
     ```
 
-3. Create a directory for user data in your **home directory** to persist Gemini CLI's user-specific data.
+* **Create `.gemini` directory**: This directory saves your chat history and settings outside the container. Create it in your **home directory**.
 
     ```bash
     mkdir -p ~/.gemini
     ```
 
-## How to Run
+## 3. How to Run
 
-1. To run Gemini CLI, execute the following command:
+Execute the following command to start the Gemini CLI. This command creates a container environment with the following characteristics:
 
-    ```bash
-    docker run -it --rm \
-      --env-file ~/.env.gemini \
-      -v "~/.gemini:/home/node/.gemini" \
-      -v "$(pwd):/workspace" \
-      -w "/workspace" \
-      naoyoshinori/gemini-cli:0.1-node \
-      gemini
-    ```
+* **User:** `node` (non-root)
+* **Workdir:** `/workspace` (for mounting your projects)
+* **Exposed Ports:** None
 
-    Success if the container starts and an interactive Gemini CLI prompt is displayed.
+```bash
+docker run -it --rm \
+  --env-file ~/.env.gemini \
+  -v "~/.gemini:/home/node/.gemini" \
+  -v "$(pwd):/workspace" \
+  -w "/workspace" \
+  naoyoshinori/gemini-cli:0.1-node \
+  gemini
+```
 
-## Other Use Cases
+*Note: Please check [Docker Hub](https://hub.docker.com/r/naoyoshinori/gemini-cli/tags) for the latest available image tags.*
 
-For more advanced or specific use cases, please refer to the following guides:
+If successful, the container will start, and you will see an interactive Gemini CLI prompt.
 
-- [**Using Gemini CLI with Docker Run**](./examples/container/README.md)
-- [**Using Gemini CLI with Docker Compose**](./examples/docker-compose/README.md)
-- [**Using Gemini CLI with VS Code Dev Containers**](./examples/devcontainer/README.md)
-- [**Using Gemini CLI with MCP Gateway via Docker Compose**](./examples/mcp-gateway/README.md)
+## 4. Examples
+
+For more advanced scenarios, you can refer to the following examples:
+
+* [Using Gemini CLI with Docker Compose](./examples/docker-compose/)
+* [Using Gemini CLI with VS Code Dev Containers](./examples/devcontainer/)
+* [Using Gemini CLI with MCP Gateway via Docker Compose](./examples/mcp-gateway/)
