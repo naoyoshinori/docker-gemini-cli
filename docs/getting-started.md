@@ -13,13 +13,13 @@ Before you begin, make sure you have the following:
 
 Prepare a configuration file for your API key and a directory to persist user data.
 
-* **Create the `.env.gemini` file**: In your **home directory**, create a file named `.env.gemini`. Add the following line to the file, replacing `YOUR_API_KEY_HERE` with your actual key.
+* **Configure API Key**: In your **home directory**, create a file named `.env.gemini` with the following content, replacing `YOUR_API_KEY_HERE` with your actual key:
 
     ```bash
     GEMINI_API_KEY=YOUR_API_KEY_HERE
     ```
 
-* **Create `.gemini` directory**: This directory saves your chat history and settings outside the container. Create it in your **home directory**.
+* **Persist User Data**: In your **home directory**, create a `.gemini` directory to save your chat history and settings.
 
     ```bash
     mkdir -p ~/.gemini
