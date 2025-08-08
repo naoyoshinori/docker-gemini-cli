@@ -1,31 +1,27 @@
-# Using Gemini CLI with Docker Compose
+# Using the Gemini CLI with Docker Compose
 
-This is a very simple example of running Gemini CLI using Docker Compose.
+This example demonstrates how to run the Gemini CLI using Docker Compose.
 
-+ **User:** `node` (non-root)
-+ **Workdir:** `/workspace` (for mounting your projects)
-+ **Exposed Ports:** None
+The container environment is configured as follows:
 
-## Prerequisites
-
-1. Create a `.env.gemini` file in your **home directory** and add your **Google Gemini API key** to it.
-
-    **Example:**
-
-    ```bash
-    GEMINI_API_KEY=YOUR_API_KEY
-    ```
+* **User:** `node` (non-root)
+* **Workdir:** `/workspace` (for mounting your projects)
+* **Exposed Ports:** None
 
 ## How to Run
 
-1. Start the Docker Compose services:
+1. **Start the service**: From this directory, run the following command to start the service in the background.
 
     ```bash
     docker-compose up -d
     ```
 
-2. Once the service is running, you can execute **Gemini CLI** with the following command:
+2. **Execute the Gemini CLI**: Once the service is running, you can execute the Gemini CLI with this command:
 
     ```bash
     docker-compose exec gemini-cli gemini
     ```
+
+---
+
+[Documentation Home](../../index.md)
