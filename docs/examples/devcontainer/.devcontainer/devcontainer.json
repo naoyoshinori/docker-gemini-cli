@@ -8,7 +8,7 @@
   "runArgs": ["--env-file","${localEnv:HOME}${localEnv:USERPROFILE}/.env.gemini"],
 
   // Configures the workspace folder. By default, it's set to:
-	// "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  // "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
   // Mounts the workspace. By default, it mounts the directory as:
   // "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
