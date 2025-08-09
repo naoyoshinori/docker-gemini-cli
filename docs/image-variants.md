@@ -1,31 +1,54 @@
 # Image Variants
 
-This image comes in three main variants to suit different use cases.
+This project offers three main image variants, each designed for a different use case. This document details the available image variants to help you choose the best one for your needs.
 
-## `gemini-cli:<version>-node`
+## Recommended Tags
 
-The `node` variant is based on the Node.js [Docker Official Image](https://hub.docker.com/_/node). It is focused on providing a minimal environment to run `gemini-cli`, making it lightweight.
+For most users, we recommend using one of the following tags. These point to the latest stable version of their respective base images.
 
-* **Example Tag:** `naoyoshinori/gemini-cli:0.1-node`
-* **Recommended Use:**
-  * For running `gemini-cli` commands directly from the command line.
-  * For integration into scripts or CI/CD pipelines.
-  * When you only need a pure execution environment without development tools.
+* `naoyoshinori/gemini-cli:0.1-node`
+* `naoyoshinori/gemini-cli:0.1-javascript-node`
+* `naoyoshinori/gemini-cli:0.1-typescript-node`
 
-## `gemini-cli:<version>-javascript-node`
+## Variant Details
 
-The `javascript-node` variant is based on the [Microsoft Dev Containers `javascript-node` image](https://github.com/devcontainers/templates/tree/main/src/javascript-node). It includes common development tools like `git` and `zsh` for JavaScript development.
+### `node` Variant
 
-* **Example Tag:** `naoyoshinori/gemini-cli:0.1-javascript-node`
-* **Recommended Use:**
-  * As a development environment in VS Code Dev Containers for JavaScript projects.
-  * When you need to perform Git operations or use other command-line tools in the same environment while working with `gemini-cli`.
+Based on the [Node.js Docker Official Image](https://hub.docker.com/_/node), this is a minimal, lightweight image for running the Gemini CLI.
 
-## `gemini-cli:<version>-typescript-node`
+* **Best for:**
+  * Running Gemini CLI commands directly.
+  * Integration into scripts or CI/CD pipelines.
+  * Pure execution environments that do not require development tools.
 
-The `typescript-node` variant is based on the [Microsoft Dev Containers `typescript-node` image](https://github.com/devcontainers/templates/tree/main/src/typescript-node). In addition to the tools in `javascript-node`, it includes TypeScript-specific tools and provides a richer development environment.
+### `javascript-node` Variant
 
-* **Example Tag:** `naoyoshinori/gemini-cli:0.1-typescript-node`
-* **Recommended Use:**
-  * As a development environment in VS Code Dev Containers for TypeScript projects.
-  * When you want to develop with `gemini-cli` while performing type checking and linting in your TypeScript project.
+Based on the [Microsoft Dev Containers `javascript-node` image](https://github.com/devcontainers/templates/tree/main/src/javascript-node), this variant includes common development tools like `git` and `zsh`.
+
+* **Best for:**
+  * Use as a development environment in VS Code Dev Containers.
+  * Situations where you need Git or other shell tools alongside the Gemini CLI.
+
+### `typescript-node` Variant
+
+Based on the [Microsoft Dev Containers `typescript-node` image](https://github.com/devcontainers/templates/tree/main/src/typescript-node), this adds TypeScript-specific tools on top of the `javascript-node` variant.
+
+* **Best for:**
+  * Use as a development environment for TypeScript projects.
+  * Situations where you want to perform type-checking and linting while using the CLI.
+
+## About Image Tags
+
+All image tags follow the format below. Please note that a `latest` tag is not provided to encourage deliberate version selection.
+
+**Tag Format:** `<version>-<base_image>` or `<version>-<base_image>-<base_image_variant>`
+
+* **`<version>`**: The version of the Gemini CLI (e.g., `0.1`).
+* **`<base_image>`**: The base image name (`node`, `javascript-node`, or `typescript-node`).
+* **`<base_image_variant>`** (Optional): A variant tag from the base image, which typically specifies the Node.js version and OS (e.g., `22-bookworm`).
+
+If you need to lock to a specific version for maximum reproducibility (e.g., in CI/CD), you can use a **"fully-qualified tag"** which includes the `<base_image_variant>`, such as `0.1-javascript-node-22-bookworm`.
+
+---
+
+[Documentation Home](./index.md)
