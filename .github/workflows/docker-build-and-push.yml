@@ -24,15 +24,18 @@ jobs:
           username: ${{ vars.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-      - name: Build and Push Docker Images
+      - name: Build Docker Images
         run: |
           VARIANTS=("typescript-node" "javascript-node" "node")
           for VARIANT in "${VARIANTS[@]}"; do
             echo "Building and pushing $VARIANT image..."
-            chmod +x ./build.sh   && ./build.sh   "$VARIANT"
-            chmod +x ./release.sh && ./release.sh "$VARIANT"
+            chmod +x ./build.sh && ./build.sh "$VARIANT"
           done
         env:
-          DOCKER_IMAGE_REGISTRY: ${{ vars.DOCKER_IMAGE_REGISTRY }}
           DOCKER_REGISTRY_USER: ${{ vars.DOCKER_REGISTRY_USER }}
-          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Push Docker Images
+        run: |
+          docker push --all-tags "${DOCKER_REGISTRY_USER}/gemini-cli"
+        env:
+          DOCKER_REGISTRY_USER: ${{ vars.DOCKER_REGISTRY_USER }}
