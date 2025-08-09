@@ -2,6 +2,8 @@
 
 This example demonstrates how to use the Gemini CLI with a Docker MCP Gateway using Docker Compose.
 
+The Docker MCP Gateway allows you to securely expose local and containerized tools to AI models. For more detailed information about the gateway itself, please refer to the official [Docker documentation](https://docs.docker.com/ai/mcp-gateway/) and the [GitHub repository](https://github.com/docker/mcp-gateway).
+
 The container environment is configured as follows:
 
 * **User:** `node` (non-root)
