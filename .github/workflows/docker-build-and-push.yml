@@ -26,13 +26,13 @@ jobs:
 
       - name: Build and Push Docker Images
         run: |
-          export DOCKER_IMAGE_REGISTRY=${{ vars.DOCKER_IMAGE_REGISTRY }}
-          export DOCKER_REGISTRY_USER=${{ vars.DOCKER_REGISTRY_USER }}
-          export DOCKER_REGISTRY_PASSWORD=${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-
           VARIANTS=("typescript-node" "javascript-node" "node")
           for VARIANT in "${VARIANTS[@]}"; do
             echo "Building and pushing $VARIANT image..."
             chmod +x ./build.sh   && ./build.sh   "$VARIANT"
             chmod +x ./release.sh && ./release.sh "$VARIANT"
           done
+        env:
+          DOCKER_IMAGE_REGISTRY: ${{ vars.DOCKER_IMAGE_REGISTRY }}
+          DOCKER_REGISTRY_USER: ${{ vars.DOCKER_REGISTRY_USER }}
+          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
