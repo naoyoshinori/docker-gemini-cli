@@ -27,7 +27,7 @@ Prepare a configuration file for your API key and a directory to persist user da
 
 ## 3. How to Run
 
-Execute the following command to start the Gemini CLI. This command creates a container environment with the following characteristics:
+Execute the following command to start the Gemini CLI. This command starts an interactive container, mounts your local files, and sets up an environment with the following characteristics:
 
 * **User:** `node` (non-root)
 * **Workdir:** `/workspace` (for mounting your projects)
@@ -51,6 +51,10 @@ If successful, the container will start, and you will see an interactive Gemini 
 
 For more advanced scenarios, you can refer to the following examples:
 
-* [Using Gemini CLI with Docker Compose](./examples/docker-compose/)
-* [Using Gemini CLI with VS Code Dev Containers](./examples/devcontainer/)
-* [Using Gemini CLI with MCP Gateway via Docker Compose](./examples/mcp-gateway/)
+* [Using the Gemini CLI with Docker Compose](./examples/docker-compose/)
+* [Using the Gemini CLI with VS Code Dev Containers](./examples/devcontainer/)
+* [Using the Gemini CLI with Docker MCP Gateway via Docker Compose](./examples/mcp-gateway/)
+
+---
+
+[Documentation Home](./index.md)
