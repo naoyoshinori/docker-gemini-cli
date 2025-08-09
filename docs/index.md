@@ -19,8 +19,8 @@ For details on the CLI's features and commands, please refer to the [official Ge
   * Run the Gemini CLI as a persistent service using Docker Compose.
 * [**Using with VS Code Dev Containers**](./examples/devcontainer/)
   * Integrate the Gemini CLI directly into your VS Code development workflow.
-* [**Using with an MCP Gateway**](./examples/mcp-gateway/)
-  * Connect the Gemini CLI to external tools via the MCP Gateway.
+* [**Using with a Docker MCP Gateway**](./examples/mcp-gateway/)
+  * Connect the Gemini CLI to external tools via the Docker MCP Gateway.
 
 ## For Developers
 
