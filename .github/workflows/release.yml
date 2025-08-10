@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  schedule:
+    - cron: '0 11 * * *'
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # node
+          - base_image: "node"
+            base_image_variant: "24-bookworm"
+
+          - base_image: "node"
+            base_image_variant: "24-bookworm-slim"
+
+          - base_image: "node"
+            base_image_variant: "22-bookworm"
+
+          - base_image: "node"
+            base_image_variant: "22-bookworm-slim"
+            is_default: true
+
+          # javascript-node
+          - base_image: "javascript-node"
+            base_image_variant: "24-bookworm"
+
+          - base_image: "javascript-node"
+            base_image_variant: "22-bookworm"
+            is_default: true
+
+          # typescript-node
+          - base_image: "typescript-node"
+            base_image_variant: "22-bookworm"
+            is_default: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.DOCKER_IMAGE_REGISTRY }}
+          username: ${{ vars.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Gemini CLI version
+        id: get-version
+        run: |
+          VERSION_FULL=$(npm info @google/gemini-cli version)
+          VERSION_SHORT=$(echo "${VERSION_FULL}" | cut -d '.' -f 1,2)
+          echo "Gemini CLI version: ${VERSION_FULL}"
+          echo "VERSION_FULL=${VERSION_FULL}" >> ${GITHUB_OUTPUT}
+          echo "VERSION_SHORT=${VERSION_SHORT}" >> ${GITHUB_OUTPUT}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          file: ./src/${{ matrix.base_image }}/Dockerfile
+          context: ./src/${{ matrix.base_image }}
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VARIANT=${{ matrix.base_image_variant }}
+          tags: |
+            ${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:patch-${{ steps.get-version.outputs.VERSION_FULL }}-${{ matrix.base_image }}-${{ matrix.base_image_variant }}
+            ${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:${{ steps.get-version.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.base_image_variant }}
+          push: true
+
+      - name: Create and Push Main Tag
+        if: success() && matrix.is_default
+        env:
+          BASE_TAG: "${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:${{ steps.get-version.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.base_image_variant }}"
+          MAIN_TAG: "${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:${{ steps.get-version.outputs.VERSION_SHORT }}-${{ matrix.base_image }}"
+        run: |
+          echo "Creating main tag '${{ env.MAIN_TAG }}' for base tag '${{ env.BASE_TAG }}'"
+          docker buildx imagetools create --tag "${{ env.MAIN_TAG }}" "${{ env.BASE_TAG }}"
