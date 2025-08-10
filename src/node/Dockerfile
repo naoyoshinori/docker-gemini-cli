@@ -5,6 +5,9 @@ ARG USERNAME=node
 ARG NPM_GLOBAL=/usr/local/share/npm-global
 ARG NODE_MODULES="@google/gemini-cli"
 
+# Add NPM global to PATH.
+ENV PATH=${NPM_GLOBAL}/bin:${PATH}
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
@@ -26,6 +29,4 @@ RUN \
     && su ${USERNAME} -c "umask 0002 && npm install -g ${NODE_MODULES}" \
     && npm cache clean --force > /dev/null 2>&1
 
-ENV PATH=/usr/local/share/npm-global/bin:$PATH
-
-USER node
+USER ${USERNAME}
