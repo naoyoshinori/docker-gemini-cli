@@ -3,43 +3,30 @@ name: Release
 on:
   schedule:
     - cron: '0 11 * * *'
+    - cron: '0 23 * * *'
   push:
     branches:
       - main
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli
+  METADATA_DIR: ./.github/metadata
 
 jobs:
-  build-and-push:
+  build_and_release_images:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          # node
-          - base_image: "node"
-            base_image_variant: "24-bookworm"
-
-          - base_image: "node"
-            base_image_variant: "24-bookworm-slim"
-
-          - base_image: "node"
-            base_image_variant: "22-bookworm"
-
-          - base_image: "node"
-            base_image_variant: "22-bookworm-slim"
-            is_default: true
-
-          # javascript-node
-          - base_image: "javascript-node"
-            base_image_variant: "24-bookworm"
-
-          - base_image: "javascript-node"
-            base_image_variant: "22-bookworm"
-            is_default: true
-
-          # typescript-node
-          - base_image: "typescript-node"
-            base_image_variant: "22-bookworm"
-            is_default: true
+          - { base_image: "node", variant: "24-bookworm" }
+          - { base_image: "node", variant: "24-bookworm-slim" }
+          - { base_image: "node", variant: "22-bookworm" }
+          - { base_image: "node", variant: "22-bookworm-slim", is_default: true, is_main: true }
+          - { base_image: "javascript-node", variant: "24-bookworm", registry: "mcr.microsoft.com/devcontainers/" }
+          - { base_image: "javascript-node", variant: "22-bookworm", registry: "mcr.microsoft.com/devcontainers/", is_default: true }
+          - { base_image: "typescript-node", variant: "22-bookworm", registry: "mcr.microsoft.com/devcontainers/", is_default: true }
 
     steps:
       - name: Checkout repository
@@ -60,33 +47,146 @@ jobs:
           username: ${{ vars.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-      - name: Gemini CLI version
-        id: get-version
+      - name: Get Gemini CLI version from npm
+        id: version_get
         run: |
           VERSION_FULL=$(npm info @google/gemini-cli version)
           VERSION_SHORT=$(echo "${VERSION_FULL}" | cut -d '.' -f 1,2)
-          echo "Gemini CLI version: ${VERSION_FULL}"
+          echo "Gemini CLI version from npm: ${VERSION_FULL}"
           echo "VERSION_FULL=${VERSION_FULL}" >> ${GITHUB_OUTPUT}
           echo "VERSION_SHORT=${VERSION_SHORT}" >> ${GITHUB_OUTPUT}
 
-      - name: Build and Push Docker Image
+      - name: Read saved Gemini CLI version
+        id: version_load
+        env:
+          VERSION_FILE: "${{ env.METADATA_DIR }}/version.txt"
+        run: |
+          if [ -f "${VERSION_FILE}" ]; then
+            PREVIOUS_VERSION_FULL=$(cat ${VERSION_FILE})
+          fi
+          echo "Previously saved Gemini CLI version: ${PREVIOUS_VERSION_FULL:-<none>}"
+          echo "PREVIOUS_VERSION_FULL=${PREVIOUS_VERSION_FULL}" >> ${GITHUB_OUTPUT}
+
+      - name: Get base image digest (${{ matrix.base_image }}:${{ matrix.variant }})
+        id: digest_get
+        run: |
+          DIGEST=$(docker buildx imagetools inspect ${{ matrix.registry }}${{ matrix.base_image }}:${{ matrix.variant }} | grep '^Digest:' | awk '{print $2}')
+          echo "Base image digest: ${DIGEST}"
+          echo "DIGEST=${DIGEST}" >> ${GITHUB_OUTPUT}
+
+      - name: Read saved base image digest (${{ matrix.base_image }}:${{ matrix.variant }})
+        id: digest_load
+        env:
+          DIGEST_FILE: "${{ env.METADATA_DIR }}/digest-${{ matrix.base_image }}-${{ matrix.variant }}.txt"
+        run: |
+          if [ -f "${DIGEST_FILE}" ]; then
+            PREVIOUS_DIGEST=$(cat ${DIGEST_FILE})
+          fi
+          echo "Previously saved digest: ${PREVIOUS_DIGEST:-<none>}"
+          echo "PREVIOUS_DIGEST=${PREVIOUS_DIGEST}" >> ${GITHUB_OUTPUT}
+
+      - name: Check for changes in version or digest
+        id: check_changes
+        run: |
+          if [[ "${{ steps.version_get.outputs.VERSION_FULL }}" == "${{ steps.version_load.outputs.PREVIOUS_VERSION_FULL }}" && \
+                "${{ steps.digest_get.outputs.DIGEST }}" == "${{ steps.digest_load.outputs.PREVIOUS_DIGEST }}" ]]; then
+            echo "No changes detected — skipping build for ${{ matrix.base_image }}:${{ matrix.variant }}"
+            echo "is_skip_build=true" >> ${GITHUB_OUTPUT}
+          else
+            echo "Changes detected — building image for ${{ matrix.base_image }}:${{ matrix.variant }}"
+            echo "is_skip_build=false" >> ${GITHUB_OUTPUT}
+          fi
+
+      - name: Build and push image (${{ matrix.base_image }}:${{ matrix.variant }})
+        if: steps.check_changes.outputs.is_skip_build == 'false'
         uses: docker/build-push-action@v5
         with:
           file: ./src/${{ matrix.base_image }}/Dockerfile
           context: ./src/${{ matrix.base_image }}
           platforms: linux/amd64,linux/arm64
           build-args: |
-            VARIANT=${{ matrix.base_image_variant }}
+            VARIANT=${{ matrix.variant }}
           tags: |
-            ${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:patch-${{ steps.get-version.outputs.VERSION_FULL }}-${{ matrix.base_image }}-${{ matrix.base_image_variant }}
-            ${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:${{ steps.get-version.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.base_image_variant }}
+            ${{ env.IMAGE_NAME }}:patch-${{ steps.version_get.outputs.VERSION_FULL }}-${{ matrix.base_image }}-${{ matrix.variant }}
+            ${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.variant }}
           push: true
 
-      - name: Create and Push Main Tag
-        if: success() && matrix.is_default
+      - name: Create and push main tag (${{ matrix.base_image }})
+        if: steps.check_changes.outputs.is_skip_build == 'false' && matrix.is_default
         env:
-          BASE_TAG: "${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:${{ steps.get-version.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.base_image_variant }}"
-          MAIN_TAG: "${{ vars.DOCKER_REGISTRY_USER }}/gemini-cli:${{ steps.get-version.outputs.VERSION_SHORT }}-${{ matrix.base_image }}"
+          BASE_TAG: "${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.variant }}"
+          MAIN_TAG: "${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}"
         run: |
-          echo "Creating main tag '${{ env.MAIN_TAG }}' for base tag '${{ env.BASE_TAG }}'"
-          docker buildx imagetools create --tag "${{ env.MAIN_TAG }}" "${{ env.BASE_TAG }}"
+          echo "Creating main tag '${MAIN_TAG}' from base tag '${BASE_TAG}'"
+          docker buildx imagetools create --tag "${MAIN_TAG}" "${BASE_TAG}"
+
+      - name: Save current Gemini CLI version
+        if: matrix.is_main
+        env:
+          VERSION: "${{ steps.version_get.outputs.VERSION_FULL }}"
+          VERSION_FILE: "${{ env.METADATA_DIR }}/version.txt"
+        run: |
+          echo "${VERSION}" > "$VERSION_FILE"
+
+      - name: Save current base image digest (${{ matrix.base_image }}:${{ matrix.variant }})
+        env:
+          DIGEST: ${{ steps.digest_get.outputs.DIGEST }}
+          DIGEST_FILE: "${{ env.METADATA_DIR }}/digest-${{ matrix.base_image }}-${{ matrix.variant }}.txt"
+        run: |
+          echo "${DIGEST}" > "$DIGEST_FILE"
+
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.base_image }}-${{ matrix.variant }}
+          path: "${{ env.METADATA_DIR }}/digest-${{ matrix.base_image }}-${{ matrix.variant }}.txt"
+          retention-days: 1
+
+      - name: Upload version artifact
+        if: matrix.is_main
+        uses: actions/upload-artifact@v4
+        with:
+          name: version
+          path: "${{ env.METADATA_DIR }}/version.txt"
+          retention-days: 1
+
+  commit_metadata_updates:
+    needs: [build_and_release_images]
+    if: needs.build_and_release_images.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+      - name: Download all artifacts (version & digest files)
+        uses: actions/download-artifact@v4
+        with:
+          path: ./tmp
+
+      - name: Move metadata files to repo
+        run: |
+          files=$(find ./tmp -type f)
+          for file in $files; do
+            mv "$file" "${{ env.METADATA_DIR }}/"
+          done
+          git add "${{ env.METADATA_DIR }}"
+
+      - name: Commit and push metadata changes
+        run: |
+          if ! git diff --cached --quiet; then
+            echo "Metadata changes detected — committing updates."
+            git commit -m "chore(metadata): update last built Gemini CLI versions and image digests [skip ci]"
+            git push
+          else
+            echo "No metadata changes — skipping commit."
+          fi
