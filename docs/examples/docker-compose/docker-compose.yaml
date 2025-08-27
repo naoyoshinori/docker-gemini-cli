@@ -1,7 +1,7 @@
 services:
   gemini-cli:
     # Select the image variant to use
-    image: naoyoshinori/gemini-cli:0.1-node
+    image: naoyoshinori/gemini-cli:0.2-node
     # Working directory inside the container
     working_dir: /workspace
     # Synchronize files between host and container

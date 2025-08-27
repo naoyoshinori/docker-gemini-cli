@@ -36,7 +36,7 @@ To get started quickly, ensure you have Docker installed and a Gemini API key.
       -v "~/.gemini:/home/node/.gemini" \
       -v "$(pwd):/workspace" \
       -w "/workspace" \
-      naoyoshinori/gemini-cli:0.1-node \
+      naoyoshinori/gemini-cli:0.2-node \
       gemini
     ```
 
