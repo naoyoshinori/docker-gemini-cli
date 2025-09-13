@@ -1,6 +1,6 @@
 services:
   gemini-cli:
-    image: naoyoshinori/gemini-cli:0.2-node
+    image: naoyoshinori/gemini-cli:0.4-node
     working_dir: /workspace
     volumes:
       - ~/.gitconfig:/home/node/.gitconfig

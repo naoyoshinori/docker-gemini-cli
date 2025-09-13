@@ -39,7 +39,7 @@ docker run -it --rm \
   -v "~/.gemini:/home/node/.gemini" \
   -v "$(pwd):/workspace" \
   -w "/workspace" \
-  naoyoshinori/gemini-cli:0.2-node \
+  naoyoshinori/gemini-cli:0.4-node \
   gemini
 ```
 

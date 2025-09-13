@@ -2,7 +2,7 @@
   "name": "Gemini CLI Dev Container",
 
   // Select the image variant to use. For Dev Containers, `javascript-node` or `typescript-node` variants are recommended as they include development tools.
-  "image": "naoyoshinori/gemini-cli:0.2-javascript-node",
+  "image": "naoyoshinori/gemini-cli:0.4-javascript-node",
 
   // Load environment variables from .env.gemini in the home directory
   "runArgs": ["--env-file","${localEnv:HOME}${localEnv:USERPROFILE}/.env.gemini"],

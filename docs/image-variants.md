@@ -6,9 +6,9 @@ This project offers three main image variants, each designed for a different use
 
 For most users, we recommend using one of the following tags. These point to the latest stable version of their respective base images.
 
-* `naoyoshinori/gemini-cli:0.2-node`
-* `naoyoshinori/gemini-cli:0.2-javascript-node`
-* `naoyoshinori/gemini-cli:0.2-typescript-node`
+* `naoyoshinori/gemini-cli:0.4-node`
+* `naoyoshinori/gemini-cli:0.4-javascript-node`
+* `naoyoshinori/gemini-cli:0.4-typescript-node`
 
 ## Variant Details
 
@@ -43,11 +43,11 @@ All image tags follow the format below. Please note that a `latest` tag is not p
 
 **Tag Format:** `<version>-<base_image>` or `<version>-<base_image>-<base_image_variant>`
 
-* **`<version>`**: The version of the Gemini CLI (e.g., `0.2`).
+* **`<version>`**: The version of the Gemini CLI (e.g., `0.4`).
 * **`<base_image>`**: The base image name (`node`, `javascript-node`, or `typescript-node`).
 * **`<base_image_variant>`** (Optional): A variant tag from the base image, which typically specifies the Node.js version and OS (e.g., `22-bookworm`).
 
-If you need to lock to a specific version for maximum reproducibility (e.g., in CI/CD), you can use a **"fully-qualified tag"** which includes the `<base_image_variant>`, such as `0.2-javascript-node-22-bookworm`.
+If you need to lock to a specific version for maximum reproducibility (e.g., in CI/CD), you can use a **"fully-qualified tag"** which includes the `<base_image_variant>`, such as `0.4-javascript-node-22-bookworm`.
 
 ---
 
