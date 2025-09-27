@@ -21,12 +21,13 @@ jobs:
       matrix:
         include:
           - { base_image: "node", variant: "24-bookworm" }
-          - { base_image: "node", variant: "24-bookworm-slim" }
+          - { base_image: "node", variant: "24-bookworm-slim", is_default: true, is_main: true }
           - { base_image: "node", variant: "22-bookworm" }
-          - { base_image: "node", variant: "22-bookworm-slim", is_default: true, is_main: true }
-          - { base_image: "javascript-node", variant: "24-bookworm", registry: "mcr.microsoft.com/devcontainers/" }
-          - { base_image: "javascript-node", variant: "22-bookworm", registry: "mcr.microsoft.com/devcontainers/", is_default: true }
-          - { base_image: "typescript-node", variant: "22-bookworm", registry: "mcr.microsoft.com/devcontainers/", is_default: true }
+          - { base_image: "node", variant: "22-bookworm-slim" }
+          - { base_image: "javascript-node", variant: "24-bookworm", registry: "mcr.microsoft.com/devcontainers/", is_default: true }
+          - { base_image: "javascript-node", variant: "22-bookworm", registry: "mcr.microsoft.com/devcontainers/" }
+          - { base_image: "typescript-node", variant: "24-bookworm", registry: "mcr.microsoft.com/devcontainers/", is_default: true }
+          - { base_image: "typescript-node", variant: "22-bookworm", registry: "mcr.microsoft.com/devcontainers/" }
 
     steps:
       - name: Checkout repository
