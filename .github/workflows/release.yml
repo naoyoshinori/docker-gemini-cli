@@ -52,9 +52,11 @@ jobs:
         run: |
           VERSION_FULL=$(npm info @google/gemini-cli version)
           VERSION_SHORT=$(echo "${VERSION_FULL}" | cut -d '.' -f 1,2)
+          VERSION_MAJOR=$(echo "${VERSION_FULL}" | cut -d '.' -f 1)
           echo "Gemini CLI version from npm: ${VERSION_FULL}"
           echo "VERSION_FULL=${VERSION_FULL}" >> ${GITHUB_OUTPUT}
           echo "VERSION_SHORT=${VERSION_SHORT}" >> ${GITHUB_OUTPUT}
+          echo "VERSION_MAJOR=${VERSION_MAJOR}" >> ${GITHUB_OUTPUT}
 
       - name: Read saved Gemini CLI version
         id: version_load
@@ -109,16 +111,18 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:patch-${{ steps.version_get.outputs.VERSION_FULL }}-${{ matrix.base_image }}-${{ matrix.variant }}
             ${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.variant }}
+            ${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_MAJOR }}-${{ matrix.base_image }}-${{ matrix.variant }}
           push: true
 
       - name: Create and push main tag (${{ matrix.base_image }})
         if: steps.check_changes.outputs.is_skip_build == 'false' && matrix.is_default
         env:
           BASE_TAG: "${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}-${{ matrix.variant }}"
-          MAIN_TAG: "${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}"
+          MAJOR_TAG: "${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_MAJOR }}-${{ matrix.base_image }}"
+          SHORT_TAG: "${{ env.IMAGE_NAME }}:${{ steps.version_get.outputs.VERSION_SHORT }}-${{ matrix.base_image }}"
         run: |
-          echo "Creating main tag '${MAIN_TAG}' from base tag '${BASE_TAG}'"
-          docker buildx imagetools create --tag "${MAIN_TAG}" "${BASE_TAG}"
+          echo "Creating main tag '${MAJOR_TAG}, ${SHORT_TAG}' from base tag '${BASE_TAG}'"
+          docker buildx imagetools create --tag "${MAJOR_TAG}" --tag "${SHORT_TAG}" "${BASE_TAG}"
 
       - name: Save current Gemini CLI version
         if: matrix.is_main
