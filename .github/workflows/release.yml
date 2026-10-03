@@ -173,12 +173,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
         
-      - name: Download all artifacts (version & digest files)
+      - name: Download digest artifacts
         uses: actions/download-artifact@v7
         with:
           path: ./tmp
-          pattern: '*'
+          pattern: 'digest-*'
           merge-multiple: true
+
+      - name: Download version artifact
+        uses: actions/download-artifact@v7
+        with:
+          path: ./tmp
+          name: 'version'
 
       - name: Move metadata files to repo
         run: |
