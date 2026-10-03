@@ -177,7 +177,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           path: ./tmp
-          pattern: 'digest-*'
+          pattern: '*'
           merge-multiple: true
 
       - name: Move metadata files to repo
